@@ -6,7 +6,7 @@ namespace QuestaoPratica.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AlunoController : ControllerBase
+    public class AlunoController : PrincipalController
     {
         public AlunoController()
         {
@@ -79,9 +79,14 @@ namespace QuestaoPratica.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]AlunoViewModel aluno)
         {
-            if(aluno == null)
+            //if(aluno == null)
+            //{
+            //    return BadRequest();
+            //}
+
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return ApiBadRequestResponse(ModelState, "Dados Inválidos");
             }
 
             List<AlunoViewModel> alunos = LerAlunosDoArquivo();
@@ -100,7 +105,8 @@ namespace QuestaoPratica.Controllers
             alunos.Add(novoAluno);
             EscreverAlunosNoArquivo(alunos);
 
-            return CreatedAtAction(nameof(Get), new { codigo = novoAluno.Codigo }, novoAluno);
+            return ApiResponse(novoAluno, "Aluno cadastrado com sucesso!");
+            //return CreatedAtAction(nameof(Get), new { codigo = novoAluno.Codigo }, novoAluno);
         }
 
         [HttpPut("{codigo}")]
@@ -110,6 +116,7 @@ namespace QuestaoPratica.Controllers
             {
                 return BadRequest();
             }
+           
             List<AlunoViewModel> alunos = LerAlunosDoArquivo();
             int index = alunos.FindIndex(p => p.Codigo == codigo);
 
